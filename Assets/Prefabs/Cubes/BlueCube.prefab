@@ -10,8 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 7355298659039680300}
   - component: {fileID: 8568881502176137376}
-  - component: {fileID: 899600130387252845}
-  m_Layer: 8
+  - component: {fileID: 1650774408370631392}
+  m_Layer: 3
   m_Name: BlueCube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -80,33 +80,19 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1.167202, y: 1.1805784}
   m_EdgeRadius: 0
---- !u!50 &899600130387252845
-Rigidbody2D:
-  serializedVersion: 5
+--- !u!114 &1650774408370631392
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3866896461543055024}
-  m_BodyType: 0
-  m_Simulated: 1
-  m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
-  m_GravityScale: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_Interpolate: 0
-  m_SleepingMode: 1
-  m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fdb3988ec81941ec848de1e7ee08968a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Items.Cube
+  minFlickDistance: 50
 --- !u!1 &8636205302370750935
 GameObject:
   m_ObjectHideFlags: 0
@@ -117,7 +103,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7471367534676043701}
   - component: {fileID: 3068716424643084344}
-  m_Layer: 8
+  m_Layer: 3
   m_Name: Blue_Cube_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -184,8 +170,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 1832838477
+  m_SortingLayer: 2
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 6310603678928044179, guid: c16005d1516e243efa47267c9362c925, type: 3}

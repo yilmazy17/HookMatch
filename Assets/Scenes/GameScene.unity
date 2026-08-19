@@ -225,7 +225,7 @@ Camera:
   far clip plane: 1000
   field of view: 34
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 3.5
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -267,7 +267,7 @@ GameObject:
   - component: {fileID: 615925827}
   - component: {fileID: 615925828}
   - component: {fileID: 615925829}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: BackgroundImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -283,8 +283,8 @@ Transform:
   m_GameObject: {fileID: 615925826}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.20529, y: 0.13757, z: 0}
-  m_LocalScale: {x: 0.6744626, y: 0.66286445, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.25977084, y: 0.2557331, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 716486744}
@@ -388,7 +388,7 @@ Transform:
   m_GameObject: {fileID: 716486743}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.21969, y: -0.11997, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -418,7 +418,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1137806137}
   - component: {fileID: 1137806136}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: GridBackground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -470,15 +470,15 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 1121284095
+  m_SortingLayer: 1
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: -6210635282160400736, guid: a9f63f8253d6341e5a7461ad0ada7ea7, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
-  m_DrawMode: 0
+  m_DrawMode: 1
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
@@ -513,7 +513,7 @@ GameObject:
   - component: {fileID: 1185358651}
   - component: {fileID: 1185358650}
   - component: {fileID: 1185358653}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: LevelButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -628,7 +628,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1242241591}
   - component: {fileID: 1242241590}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Grid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -651,8 +651,15 @@ MonoBehaviour:
   greenCubePrefab: {fileID: 1389315748869867297, guid: aaf9b2d53aa5b41c3b59e6cc03a21030, type: 3}
   yellowCubePrefab: {fileID: 2238700225122495900, guid: 66aada97731ab4c2581a3d9032246fcf, type: 3}
   blueCubePrefab: {fileID: 3866896461543055024, guid: c83c31e6c19ab48c2a2ff9aed6463325, type: 3}
+  GridHorizontalPadding: 1
   gridBackground: {fileID: 1137806136}
-  gridContainer: {fileID: 1242241591}
+  _boxCollider2D: {fileID: 0}
+  targetCamera: {fileID: 519420031}
+  dropSpeed: 3
+  initialDropSpeed: 5
+  minDropDuration: 0.2
+  destroyDuration: 0.15
+  backgroundDropDuration: 1
 --- !u!4 &1242241591
 Transform:
   m_ObjectHideFlags: 0
@@ -662,7 +669,7 @@ Transform:
   m_GameObject: {fileID: 1242241589}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 9.74076, y: 311.0974, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -680,7 +687,7 @@ GameObject:
   - component: {fileID: 1472821078}
   - component: {fileID: 1472821080}
   - component: {fileID: 1472821079}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}

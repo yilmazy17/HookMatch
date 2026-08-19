@@ -12,17 +12,21 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: -8855945821114745612, guid: 7cad4dbc9096d4e9ea6f8059f1778433, type: 3}
+    - target: {fileID: 3068716424643084344, guid: c83c31e6c19ab48c2a2ff9aed6463325, type: 3}
+      propertyPath: m_SortingOrder
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3866896461543055024, guid: c83c31e6c19ab48c2a2ff9aed6463325, type: 3}
       propertyPath: m_Name
       value: GreenCube Variant
       objectReference: {fileID: 0}
     - target: {fileID: 7355298659039680300, guid: c83c31e6c19ab48c2a2ff9aed6463325, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -1.63
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7355298659039680300, guid: c83c31e6c19ab48c2a2ff9aed6463325, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1.6
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7355298659039680300, guid: c83c31e6c19ab48c2a2ff9aed6463325, type: 3}
       propertyPath: m_LocalPosition.z

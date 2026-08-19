@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace Core
@@ -13,6 +15,11 @@ namespace Core
 
         private const string LevelsResourcesFolder = "Levels";
         private const string LevelFilePrefix = "level_";
+
+        private static readonly Regex TargetCubesBlockRegex =
+            new Regex("\"target_cubes\"\\s*:\\s*\\{([^}]*)\\}", RegexOptions.Compiled);
+        private static readonly Regex TargetCubeEntryRegex =
+            new Regex("\"(\\w+)\"\\s*:\\s*(\\d+)", RegexOptions.Compiled);
 
         public static LevelManager Instance { get; private set; }
 
@@ -58,7 +65,22 @@ namespace Core
                 return null;
             }
 
-            return JsonUtility.FromJson<LevelData>(json.text);
+            LevelData data = JsonUtility.FromJson<LevelData>(json.text);
+            data.target_cubes = ParseTargetCubes(json.text);
+            return data;
+        }
+
+        private static Dictionary<string, int> ParseTargetCubes(string json)
+        {
+            var result = new Dictionary<string, int>();
+
+            Match block = TargetCubesBlockRegex.Match(json);
+            if (!block.Success) return result;
+
+            foreach (Match entry in TargetCubeEntryRegex.Matches(block.Groups[1].Value))
+                result[entry.Groups[1].Value] = int.Parse(entry.Groups[2].Value);
+
+            return result;
         }
     }
 }

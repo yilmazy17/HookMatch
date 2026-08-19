@@ -8,14 +8,14 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Board
   - Water
   - UI
-  - MainCamera
-  - Background
-  - GameBoard
-  - Effects
-  - UI
+  - 
+  - 
+  - 
+  - 
+  - 
   - 
   - 
   - 
@@ -40,6 +40,21 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Background
+    uniqueID: 1121284095
+    locked: 0
+  - name: Board
+    uniqueID: 1832838477
+    locked: 0
+  - name: BoardFX
+    uniqueID: 2336374549
+    locked: 0
+  - name: UI
+    uniqueID: 2795809855
+    locked: 0
+  - name: UIFX
+    uniqueID: 3213525461
     locked: 0
   m_RenderingLayers:
   - Default
