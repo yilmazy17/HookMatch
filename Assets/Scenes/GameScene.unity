@@ -647,19 +647,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c79dc528c10842e7ac1bc457430fc67f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Core.GridManager
+  ropeObjectPrefab: {fileID: 8358822231000082010, guid: 4a822984788c249319c52a2e1dcf26e6, type: 3}
   redCubePrefab: {fileID: 1449071450958235277, guid: a7761dc3b3ed44855b3be5b17f0cefa3, type: 3}
   greenCubePrefab: {fileID: 1389315748869867297, guid: aaf9b2d53aa5b41c3b59e6cc03a21030, type: 3}
   yellowCubePrefab: {fileID: 2238700225122495900, guid: 66aada97731ab4c2581a3d9032246fcf, type: 3}
   blueCubePrefab: {fileID: 3866896461543055024, guid: c83c31e6c19ab48c2a2ff9aed6463325, type: 3}
   GridHorizontalPadding: 1
+  horizontalCubePadding: 0.03
+  verticalCubePadding: 0.03
   gridBackground: {fileID: 1137806136}
-  _boxCollider2D: {fileID: 0}
   targetCamera: {fileID: 519420031}
-  dropSpeed: 3
+  dropSpeed: 5
   initialDropSpeed: 5
   minDropDuration: 0.2
   destroyDuration: 0.15
   backgroundDropDuration: 1
+  vibrateInterval: 0.2
+  pullSpeed: 20
+  homeColumnDropDelay: 0.2
 --- !u!4 &1242241591
 Transform:
   m_ObjectHideFlags: 0
@@ -892,6 +897,67 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &2379744710500306520
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3323554473915065914, guid: 4a822984788c249319c52a2e1dcf26e6, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3323554473915065914, guid: 4a822984788c249319c52a2e1dcf26e6, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3323554473915065914, guid: 4a822984788c249319c52a2e1dcf26e6, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3323554473915065914, guid: 4a822984788c249319c52a2e1dcf26e6, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3323554473915065914, guid: 4a822984788c249319c52a2e1dcf26e6, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3323554473915065914, guid: 4a822984788c249319c52a2e1dcf26e6, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3323554473915065914, guid: 4a822984788c249319c52a2e1dcf26e6, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3323554473915065914, guid: 4a822984788c249319c52a2e1dcf26e6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3323554473915065914, guid: 4a822984788c249319c52a2e1dcf26e6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3323554473915065914, guid: 4a822984788c249319c52a2e1dcf26e6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8358822231000082010, guid: 4a822984788c249319c52a2e1dcf26e6, type: 3}
+      propertyPath: m_Name
+      value: RopeAndAnchors
+      objectReference: {fileID: 0}
+    - target: {fileID: 8358822231000082010, guid: 4a822984788c249319c52a2e1dcf26e6, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 4a822984788c249319c52a2e1dcf26e6, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -900,3 +966,4 @@ SceneRoots:
   - {fileID: 716486744}
   - {fileID: 1857391015}
   - {fileID: 1242241591}
+  - {fileID: 2379744710500306520}

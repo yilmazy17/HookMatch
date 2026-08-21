@@ -1,4 +1,6 @@
+using System.Collections;
 using System.Collections.Generic;
+using Core.Gameplay.Hook;
 using DG.Tweening;
 using Items;
 using UnityEngine;
@@ -13,6 +15,8 @@ namespace Core
     /// </summary>
     public class GridManager : MonoBehaviour
     {
+        [Header("Rope Object")]
+        [SerializeField] private GameObject ropeObjectPrefab;
         [Header("Cube Prefabs")]
         [SerializeField] private GameObject redCubePrefab;
         [SerializeField] private GameObject greenCubePrefab;
@@ -21,11 +25,14 @@ namespace Core
         [Header("Grid Horizontal Padding")]
         [SerializeField] private float GridHorizontalPadding;
 
+        [Header("Cube Spacing")]
+        [SerializeField] private float horizontalCubePadding;
+        [SerializeField] private float verticalCubePadding;
+
         [Header("Background")]
         [SerializeField] private SpriteRenderer gridBackground;
 
-        [Header("Floor")]
-        [SerializeField] private BoxCollider2D _boxCollider2D;
+        [Header("Camera")]
         [SerializeField] private Camera targetCamera;
 
         [Header("Cube Animation")]
@@ -34,6 +41,11 @@ namespace Core
         [SerializeField] private float minDropDuration = 0.12f;
         [SerializeField] private float destroyDuration = 0.15f;
         [SerializeField] private float backgroundDropDuration = 1.2f;
+
+        [Header("Hook Explosion")]
+        [SerializeField] private float vibrateInterval = 0.5f;
+        [SerializeField] private float pullSpeed = 10f;
+        [SerializeField] private float homeColumnDropDelay = 0.2f;
 
         private Cube[,] _cubes;
         private int _width;
@@ -89,25 +101,26 @@ namespace Core
                     if (index >= levelData.grid.Length) continue;
 
                     string colorCode = ResolveColorCode(levelData.grid[index]);
-                    SpawnCube(col, row, colorCode, cubeScale);
+                    SpawnCube(col, row, colorCode, cubeScale, initialDropSpeed, Ease.InOutBack);
                 }
             }
 
             PositionBackground();
-            PositionFloorCollider();
         }
 
         // Instantiates a cube off-screen above its target cell, registers it in
         // the grid, and tweens it down into place. Shared by the initial build
-        // and the post-explosion cascade refill.
-        private Cube SpawnCube(int col, int row, string colorCode, Vector2 cubeScale)
+        // and the post-explosion cascade refill - each passes its own speed/ease
+        // so a mid-cascade filler can match the pace of the cubes it's chasing
+        // instead of using the initial build's slower, ease-in-heavy reveal.
+        private Cube SpawnCube(int col, int row, string colorCode, Vector2 cubeScale, float speed, Ease ease)
         {
             GameObject prefab = GetPrefabForColorCode(colorCode);
             if (prefab == null) return null;
 
             Vector3 targetPosition = GetWorldPosition(col, row, _origin);
             Vector3 spawnPosition = new Vector3(targetPosition.x, GetOffScreenTopY(), targetPosition.z);
-            float fallDuration = CalculateDropDuration(spawnPosition.y - targetPosition.y, initialDropSpeed);
+            float fallDuration = CalculateMoveDuration(spawnPosition.y - targetPosition.y, speed);
 
             GameObject cubeObject = Instantiate(prefab, spawnPosition, Quaternion.identity, transform);
             cubeObject.name = $"Cube_{col}_{row}";
@@ -128,7 +141,7 @@ namespace Core
             _cubes[col, row] = cube;
 
             cubeObject.transform.DOMove(targetPosition, fallDuration)
-                .SetEase(Ease.InOutBack)
+                .SetEase(ease)
                 .SetLink(cubeObject);
 
             return cube;
@@ -151,6 +164,7 @@ namespace Core
             int furthestCol = startCol;
             int furthestRow = startRow;
             bool foundMatch = false;
+            var matchingCubes = new List<Cube>();
 
             int col = startCol + direction.x;
             int row = startRow + direction.y;
@@ -163,6 +177,7 @@ namespace Core
                     furthestCol = col;
                     furthestRow = row;
                     foundMatch = true;
+                    matchingCubes.Add(cube);
                 }
 
                 col += direction.x;
@@ -175,42 +190,190 @@ namespace Core
                 return; // nothing of the same color for the hook to attach to
             }
 
-            ExplodeLine(startCol, startRow, furthestCol, furthestRow, direction);
+            StartCoroutine(PlayHookExplosion(startCube, matchingCubes, startCol, startRow, furthestCol, furthestRow, direction));
         }
 
-        // Pulls every cube from the start cell to the furthest hook cell
-        // (inclusive, any color) back to the start position and destroys it,
-        // then drops each column that lost a cube.
-        private void ExplodeLine(int startCol, int startRow, int endCol, int endRow, Vector2Int direction)
+        // Telegraphs the hook by vibrating the flicked cube and every same-color
+        // match along the line, nearest to furthest, vibrateInterval apart. Then
+        // pulls the furthest match back toward the start one cell at a time,
+        // eliminating whatever cube (any color) sits in each cell as it arrives -
+        // so each column's refill fires as its own gap appears instead of every
+        // column dropping together at the end.
+        private IEnumerator PlayHookExplosion(Cube startCube, List<Cube> matchingCubes, int startCol, int startRow, int endCol, int endRow, Vector2Int direction)
         {
-            Vector3 startWorldPosition = GetWorldPosition(startCol, startRow, _origin);
-            var affectedColumns = new HashSet<int>();
+            var hookRopes = new List<Rope>();
+            Cube previousHookedCube = startCube;
 
+            startCube.Vibrate();
+            foreach (Cube matchingCube in matchingCubes)
+            {
+                yield return new WaitForSeconds(vibrateInterval);
+                matchingCube.Vibrate();
+
+                // Build a chain between consecutive hooked cubes. This avoids
+                // one long rope running directly from the first match to the
+                // last when there are several same-colour cubes in the line.
+                Rope hookRope = SpawnHookRope(previousHookedCube, matchingCube);
+                if (hookRope != null)
+                    hookRopes.Add(hookRope);
+
+                previousHookedCube = matchingCube;
+            }
+
+            // Let the completed chain read for one beat before the pull starts.
+            yield return new WaitForSeconds(vibrateInterval);
+
+            // Snapshot the path (start to end, inclusive) without clearing the grid
+            // yet - clearing every cell upfront would make DropColumn see the whole
+            // line as vacated at once, so a same-column chain would drop cubes from
+            // above straight through cells the pulled cube hasn't reached yet. Each
+            // cell is cleared only once the pulled cube actually arrives there.
+            var pathCells = new List<(int col, int row, Cube cube)>();
             int col = startCol;
             int row = startRow;
-
             while (true)
             {
-                Cube cube = _cubes[col, row];
-                if (cube != null)
-                {
-                    _cubes[col, row] = null;
-                    affectedColumns.Add(col);
-
-                    cube.transform.DOKill();
-                    cube.transform.DOMove(startWorldPosition, destroyDuration)
-                        .SetEase(Ease.InOutBack)
-                        .SetLink(cube.gameObject)
-                        .OnComplete(() => Destroy(cube.gameObject));
-                }
-
+                pathCells.Add((col, row, _cubes[col, row]));
                 if (col == endCol && row == endRow) break;
                 col += direction.x;
                 row += direction.y;
             }
 
-            foreach (int affectedColumn in affectedColumns)
-                DropColumn(affectedColumn);
+            int pathLastIndex = pathCells.Count - 1;
+
+            // Normally the furthest match travels back and converges at the
+            // start. For a straight-down flick that looks wrong - it'd mean
+            // cubes flying back up against gravity - so that case is inverted:
+            // the start cube is the one that travels, converging at the bottom
+            // (furthest) cell instead.
+            bool reversed = direction.x == 0 && direction.y > 0;
+            int pulledIndex = reversed ? 0 : pathLastIndex;
+            int step = reversed ? 1 : -1;
+            int activeRopeIndex = reversed ? 0 : hookRopes.Count - 1;
+
+            var hookedCubes = new HashSet<Cube>(matchingCubes) { startCube };
+
+            Cube pulledCube = pathCells[pulledIndex].cube;
+            int homeCol = pathCells[pulledIndex].col;
+            int homeRow = pathCells[pulledIndex].row;
+
+            // The pulled cube leaves its own cell immediately, but the refill is
+            // timed off an inspector-tunable delay rather than the travel time.
+            _cubes[homeCol, homeRow] = null;
+            StartCoroutine(DropColumnAfterDelay(homeCol, homeColumnDropDelay));
+
+            for (int i = pulledIndex + step; i >= 0 && i <= pathLastIndex; i += step)
+            {
+                (int cellCol, int cellRow, Cube occupant) = pathCells[i];
+                Vector3 targetPosition = GetWorldPosition(cellCol, cellRow, _origin);
+                float duration = CalculateMoveDuration(Vector3.Distance(pulledCube.transform.position, targetPosition), pullSpeed);
+
+                Tween moveTween = pulledCube.transform.DOMove(targetPosition, duration)
+                    .SetEase(Ease.Linear)
+                    .SetLink(pulledCube.gameObject);
+                yield return moveTween.WaitForCompletion(true);
+
+                // Once the pulled cube reaches the next hooked cube, hand the
+                // rope chain over to it. Example A-B-C: C first retracts B-C;
+                // at B, B-C is removed and A-B's B endpoint is retargeted to C,
+                // so the remaining A-C rope now retracts during the next step.
+                if (occupant != null && hookedCubes.Contains(occupant))
+                {
+                    if (activeRopeIndex >= 0 && activeRopeIndex < hookRopes.Count)
+                    {
+                        DestroyHookRope(hookRopes[activeRopeIndex]);
+                        hookRopes[activeRopeIndex] = null;
+                    }
+
+                    activeRopeIndex += reversed ? 1 : -1;
+                    if (activeRopeIndex >= 0 && activeRopeIndex < hookRopes.Count)
+                    {
+                        Rope nextRope = hookRopes[activeRopeIndex];
+                        if (nextRope != null)
+                        {
+                            if (reversed)
+                                nextRope.RetargetFirstCube(pulledCube.transform);
+                            else
+                                nextRope.RetargetSecondCube(pulledCube.transform);
+                        }
+                    }
+                }
+
+                // Only clear + drop this cell once the pulled cube has actually
+                // reached it, so cubes above never fall through cells it hasn't
+                // passed yet.
+                _cubes[cellCol, cellRow] = null;
+                if (occupant != null)
+                {
+                    PopAndDestroy(occupant);
+                    DropColumn(cellCol);
+                }
+            }
+
+            PopAndDestroy(pulledCube);
+
+            // Keep the ropes alive during the pull so their kinematic anchors
+            // follow the moving cube and make it look physically rope-driven.
+            foreach (Rope hookRope in hookRopes)
+                DestroyHookRope(hookRope);
+        }
+
+        private void DestroyHookRope(Rope rope)
+        {
+            if (rope == null) return;
+
+            rope.Clear();
+            Destroy(rope.gameObject);
+        }
+
+        private Rope SpawnHookRope(Cube firstCube, Cube secondCube)
+        {
+            if (ropeObjectPrefab == null)
+            {
+                Debug.LogWarning("[GridManager] Rope Object Prefab is not assigned.", this);
+                return null;
+            }
+
+            GameObject ropeObject = Instantiate(ropeObjectPrefab, transform);
+            ropeObject.name = $"Rope_{firstCube.Column}_{firstCube.Row}_to_{secondCube.Column}_{secondCube.Row}";
+
+            Rope rope = ropeObject.GetComponent<Rope>();
+            if (rope == null)
+            {
+                Debug.LogError(
+                    $"[GridManager] Rope prefab '{ropeObjectPrefab.name}' has no Rope component.",
+                    ropeObject);
+                Destroy(ropeObject);
+                return null;
+            }
+
+            // Segment Count on the Rope prefab represents one grid-cell span.
+            // Scale it by the number of cells between the hooked cubes, so a
+            // distance of 3 with Segment Count 6 creates 18 pieces.
+            int columnDistance = Mathf.Abs(secondCube.Column - firstCube.Column);
+            int rowDistance = Mathf.Abs(secondCube.Row - firstCube.Row);
+            int gridDistance = Mathf.Max(1, columnDistance + rowDistance);
+            int totalSegmentCount = rope.SegmentCount * gridDistance;
+
+            rope.Build(firstCube.transform, secondCube.transform, totalSegmentCount);
+            return rope;
+        }
+
+        private IEnumerator DropColumnAfterDelay(int col, float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            DropColumn(col);
+        }
+
+        private void PopAndDestroy(Cube cube)
+        {
+            if (cube == null) return;
+
+            cube.transform.DOKill();
+            cube.transform.DOScale(Vector3.zero, destroyDuration)
+                .SetEase(Ease.InBack)
+                .SetLink(cube.gameObject)
+                .OnComplete(() => Destroy(cube.gameObject));
         }
 
         // Compacts a column so every remaining cube ends up stacked at the
@@ -233,10 +396,16 @@ namespace Core
                     cube.SetGridPosition(col, writeRow);
 
                     Vector3 targetPosition = GetWorldPosition(col, writeRow, _origin);
-                    float duration = CalculateDropDuration(Vector3.Distance(cube.transform.position, targetPosition), dropSpeed);
+                    float duration = CalculateMoveDuration(Vector3.Distance(cube.transform.position, targetPosition), dropSpeed);
                     cube.transform.DOKill();
+                    // Linear, not InOutBack: this cube may get re-targeted by another
+                    // DropColumn call before this tween finishes (a same-column cascade
+                    // fires once per step), and InOutBack always ramps up from zero
+                    // velocity - repeatedly restarting that ramp is what made cubes look
+                    // like they stall then jump. Linear lets a redirect continue at the
+                    // same speed instead of resetting it.
                     cube.transform.DOMove(targetPosition, duration)
-                        .SetEase(Ease.InOutBack)
+                        .SetEase(Ease.Linear)
                         .SetLink(cube.gameObject);
                 }
 
@@ -245,15 +414,20 @@ namespace Core
 
             if (writeRow < 0) return; // column was already full
 
+            // New fillers use dropSpeed (not initialDropSpeed) and Linear ease so they
+            // fall at the same rate as the cubes above them being compacted down,
+            // instead of the initial build's slower, ease-heavy reveal getting
+            // constantly interrupted by the next cascade step.
             Vector2 cubeScale = CalculateCubeScale();
             for (int row = 0; row <= writeRow; row++)
-                SpawnCube(col, row, ResolveColorCode("rand"), cubeScale);
+                SpawnCube(col, row, ResolveColorCode("rand"), cubeScale, dropSpeed, Ease.Linear);
         }
 
-        // Falling further should take longer, not the same time as a short drop -
-        // duration scales with distance at a constant fall speed, floored so very
-        // short drops (e.g. shifting down one cell) don't look instant.
-        private float CalculateDropDuration(float distance, float speed)
+        // Moving further should take longer, not the same time as a short move -
+        // duration scales with distance at a constant speed, floored so very
+        // short moves (e.g. shifting down one cell) don't look instant. Shared
+        // by cube drops, column shifts, and the hook pull.
+        private float CalculateMoveDuration(float distance, float speed)
         {
             if (speed <= 0f) return minDropDuration;
             return Mathf.Max(minDropDuration, distance / speed);
@@ -297,12 +471,20 @@ namespace Core
         }
 
         // Cube prefabs are authored at their own native sprite size, so scale them
-        // up/down to match the screen-fit cell size computed above.
+        // up/down to match the screen-fit cell size computed above, shrunk by the
+        // configured padding so neighboring cubes leave a visible gap. The cell
+        // size itself (and therefore cube spacing/positions) is untouched - only
+        // the cube's own rendered size shrinks within its cell.
         private Vector2 CalculateCubeScale()
         {
             Vector2 nativeSize = DetermineNativePrefabSize();
             if (nativeSize.x <= 0f || nativeSize.y <= 0f) return Vector2.one;
-            return new Vector2(_cellSize.x / nativeSize.x, _cellSize.y / nativeSize.y);
+
+            Vector2 targetSize = new Vector2(
+                Mathf.Max(0f, _cellSize.x - horizontalCubePadding),
+                Mathf.Max(0f, _cellSize.y - verticalCubePadding));
+
+            return new Vector2(targetSize.x / nativeSize.x, targetSize.y / nativeSize.y);
         }
 
         private Vector2 DetermineNativePrefabSize()
@@ -377,25 +559,6 @@ namespace Core
             if (targetCamera == null) return transform.position.y + 20f;
 
             return targetCamera.transform.position.y + targetCamera.orthographicSize + _cellSize.y;
-        }
-
-        private void PositionFloorCollider()
-        {
-            if (_boxCollider2D == null || targetCamera == null) return;
-
-            float camHeight = targetCamera.orthographicSize * 2f;
-            float camWidth = camHeight * targetCamera.aspect;
-            float screenBottom = targetCamera.transform.position.y - targetCamera.orthographicSize;
-
-            // Thickness scales with cell size so it stays proportional to the cubes
-            // it needs to catch, whatever the current level's grid looks like.
-            float colliderHeight = _cellSize.y;
-
-            _boxCollider2D.size = new Vector2(camWidth, colliderHeight);
-            _boxCollider2D.transform.position = new Vector3(
-                targetCamera.transform.position.x,
-                screenBottom - colliderHeight * 0.5f,
-                0f);
         }
 
         private void ClearGrid()

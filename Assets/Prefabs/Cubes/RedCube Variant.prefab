@@ -8,10 +8,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1650774408370631392, guid: c83c31e6c19ab48c2a2ff9aed6463325, type: 3}
+      propertyPath: hookedSprite
+      value: 
+      objectReference: {fileID: 8452165846934726040, guid: 72e4270f7cfed4a81b20cef83cb5baed, type: 3}
     - target: {fileID: 3068716424643084344, guid: c83c31e6c19ab48c2a2ff9aed6463325, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 1499239488754091450, guid: a700c74be1c2a4be6b0cf717b0a6129d, type: 3}
+      objectReference: {fileID: 7210243778478081941, guid: f02bfa336ff4f46a3ac9c815702c53b2, type: 3}
     - target: {fileID: 3866896461543055024, guid: c83c31e6c19ab48c2a2ff9aed6463325, type: 3}
       propertyPath: m_Name
       value: RedCube Variant

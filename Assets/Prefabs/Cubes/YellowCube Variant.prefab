@@ -8,10 +8,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1650774408370631392, guid: c83c31e6c19ab48c2a2ff9aed6463325, type: 3}
+      propertyPath: hookedSprite
+      value: 
+      objectReference: {fileID: 2635931451490263453, guid: b2ae9e75b66124b81891ea76b6e13a30, type: 3}
     - target: {fileID: 3068716424643084344, guid: c83c31e6c19ab48c2a2ff9aed6463325, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: -7302194004337150328, guid: 9c2c2f4490a8e49a88103fa4f70005e5, type: 3}
+      objectReference: {fileID: 1168956937621780236, guid: f19730f0a1f6e44f1a61c9375021150f, type: 3}
     - target: {fileID: 3866896461543055024, guid: c83c31e6c19ab48c2a2ff9aed6463325, type: 3}
       propertyPath: m_Name
       value: YellowCube Variant

@@ -10,6 +10,13 @@ namespace Items
         [SerializeField] private float minFlickDistance = 50f;
         [SerializeField] private float shakeDuration = 0.3f;
         [SerializeField] private float shakeStrength = 0.15f;
+        [SerializeField] private float vibrateDuration = 0.2f;
+        [SerializeField] private float vibrateStrength = 0.08f;
+
+        [Header("Hooked Visual")]
+        [SerializeField] private Sprite hookedSprite;
+
+        private bool isHooked { get; set; }
 
         public int Column { get; private set; }
         public int Row { get; private set; }
@@ -17,6 +24,12 @@ namespace Items
 
         private GridManager _gridManager;
         private Vector2 _pressScreenPosition;
+        private SpriteRenderer _spriteRenderer;
+
+        private void Awake()
+        {
+            _spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        }
 
         public void Initialize(GridManager gridManager, int column, int row, string colorCode)
         {
@@ -38,6 +51,21 @@ namespace Items
         {
             transform.DOKill();
             transform.DOShakePosition(shakeDuration, shakeStrength, vibrato: 20, randomness: 90, fadeOut: true)
+                .SetLink(gameObject);
+        }
+
+        // Telegraph pulse marking this cube as part of an in-progress hook chain.
+        // Shakes scale rather than position so it can freely overlap with the
+        // pull movement that may start on this cube right after. Also swaps in
+        // the hooked-look sprite so a vibrating cube reads as "caught" even
+        // before it starts moving.
+        public void Vibrate()
+        {
+            isHooked = true;
+            if (_spriteRenderer != null && hookedSprite != null)
+                _spriteRenderer.sprite = hookedSprite;
+
+            transform.DOShakeScale(vibrateDuration, vibrateStrength, vibrato: 10, randomness: 90, fadeOut: true)
                 .SetLink(gameObject);
         }
 

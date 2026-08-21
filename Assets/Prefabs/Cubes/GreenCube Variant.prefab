@@ -8,10 +8,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1650774408370631392, guid: c83c31e6c19ab48c2a2ff9aed6463325, type: 3}
+      propertyPath: hookedSprite
+      value: 
+      objectReference: {fileID: -2988558985698005760, guid: 3c4d00b9e99c44e2084b53417db55483, type: 3}
     - target: {fileID: 3068716424643084344, guid: c83c31e6c19ab48c2a2ff9aed6463325, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: -8855945821114745612, guid: 7cad4dbc9096d4e9ea6f8059f1778433, type: 3}
+      objectReference: {fileID: 1814562403416998048, guid: c69154dbb165d44e2b4264d3e7964c58, type: 3}
     - target: {fileID: 3068716424643084344, guid: c83c31e6c19ab48c2a2ff9aed6463325, type: 3}
       propertyPath: m_SortingOrder
       value: 0
