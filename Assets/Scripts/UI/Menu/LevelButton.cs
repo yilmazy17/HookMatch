@@ -1,3 +1,4 @@
+using Core;
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
@@ -5,13 +6,18 @@ using UnityEngine.EventSystems;
 
 namespace UI.Menu
 {
-    public class LevelButton : MonoBehaviour
+    public class LevelButton : MonoBehaviour, IPointerClickHandler
     {
         [Header("Animation Settings")]
         [SerializeField] private float _exitDuration = 0.5f;
+        [SerializeField] private float _clickScaleAmount = 0.9f;
+        [SerializeField] private float _clickScaleDuration = 0.08f;
 
         [Header("Text Settings")]
         [SerializeField] private TextMeshProUGUI levelText;
+
+        [Header("Grid")]
+        [SerializeField] private GridManager gridManager;
 
         private RectTransform _rectTransform;
         private Vector2 _originalAnchoredPosition;
@@ -25,39 +31,45 @@ namespace UI.Menu
 
         private void OnEnable()
         {
-            // if (LevelManager.Instance != null)
-            // {
-            //     LevelManager.Instance.OnLevelChanged += UpdateUI;
-            // UpdateUI();
-            // GetButton();
-            // }
+            if (LevelManager.Instance != null)
+                LevelManager.Instance.OnLevelChanged += HandleLevelChanged;
+
+            UpdateUI();
         }
 
         private void OnDisable()
         {
-            // if (LevelManager.Instance != null)
-            //     LevelManager.Instance.OnLevelChanged -= UpdateUI;
+            if (LevelManager.Instance != null)
+                LevelManager.Instance.OnLevelChanged -= HandleLevelChanged;
         }
 
-        private void OnPointerClick(PointerEventData eventData)
+        private void HandleLevelChanged(int level) => UpdateUI();
+
+        public void OnPointerClick(PointerEventData eventData)
         {
             if (levelText.text  == "Finished") return;
-            
-            _rectTransform.DOAnchorPosY(-Screen.height, _exitDuration)
-                .SetEase(Ease.InBack)
-                .OnComplete(() =>
+
+            _rectTransform.DOKill();
+            DOTween.Sequence()
+                .Append(_rectTransform.DOScale(_clickScaleAmount, _clickScaleDuration).SetEase(Ease.OutQuad))
+                .Append(_rectTransform.DOScale(1f, _clickScaleDuration).SetEase(Ease.OutQuad))
+                .AppendCallback(() =>
                 {
-                    // GameStateManager.Instance.ChangeState(GameState.GameStarted);
-                    gameObject.SetActive(false);
+                    _rectTransform.DOAnchorPosY(-Screen.height, _exitDuration)
+                        .SetEase(Ease.InBack)
+                        .OnComplete(() =>
+                        {
+                            if (gridManager != null) gridManager.StartLevel();
+                            gameObject.SetActive(false);
+                        })
+                        .SetLink(gameObject);
                 })
                 .SetLink(gameObject);
         }
 
         public Tween GetButton()
         {
-            // int currentLevel = LevelManager.Instance.CurrentLevel;
-            // int maxLevel = LevelManager.Instance.MaxLevel;
-            // levelText.text = currentLevel > maxLevel ? "Finished" : $"Level {currentLevel}";
+            UpdateUI();
             gameObject.SetActive(true);
         
             if (_rectTransform == null)
@@ -83,10 +95,11 @@ namespace UI.Menu
 
         public void UpdateUI()
         {
-            // int currentLevel = LevelManager.Instance.CurrentLevel;
-            // int maxLevel = LevelManager.Instance.MaxLevel;
-            // levelText.text = currentLevel > maxLevel ? "Finished" : $"Level {currentLevel}";
-            
+            if (LevelManager.Instance == null || levelText == null) return;
+
+            int currentLevel = LevelManager.Instance.CurrentLevel;
+            int maxLevel = LevelManager.Instance.MaxLevel;
+            levelText.text = currentLevel > maxLevel ? "Finished" : $"Level {currentLevel}";
         }
     }
 }

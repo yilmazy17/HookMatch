@@ -17,6 +17,10 @@ namespace Core
     {
         [Header("Rope Object")]
         [SerializeField] private GameObject ropeObjectPrefab;
+        [Tooltip("Reduces segment density for every additional grid-cell span. Example: 6, 5.5, 5...")]
+        [SerializeField, Min(0f)] private float ropeSegmentsPerCellFalloff = 0.5f;
+        [Tooltip("Lowest allowed segment density on long ropes.")]
+        [SerializeField, Min(1f)] private float minimumRopeSegmentsPerCell = 3f;
         [Header("Cube Prefabs")]
         [SerializeField] private GameObject redCubePrefab;
         [SerializeField] private GameObject greenCubePrefab;
@@ -64,6 +68,16 @@ namespace Core
             }
 
             LevelManager.Instance.OnLevelChanged += HandleLevelChanged;
+        }
+
+        // Called once the player picks a level (e.g. from LevelButton) instead of
+        // building automatically on scene load, so the grid only appears after
+        // the level-select UI has been dismissed.
+        public void StartLevel()
+        {
+            if (LevelManager.Instance == null) return;
+
+            gameObject.SetActive(true);
 
             LevelData levelData = LevelManager.Instance.LoadCurrentLevelData();
             if (levelData != null) BuildGrid(levelData);
@@ -347,13 +361,21 @@ namespace Core
                 return null;
             }
 
-            // Segment Count on the Rope prefab represents one grid-cell span.
-            // Scale it by the number of cells between the hooked cubes, so a
-            // distance of 3 with Segment Count 6 creates 18 pieces.
+            // Segment Count on the Rope prefab is the density for adjacent
+            // cubes. Reduce that density slightly over longer distances: with
+            // base 6 and falloff 0.5 the totals are 1*6=6, 2*5.5=11,
+            // 3*5=15, etc. Round because a physical segment count is integral.
             int columnDistance = Mathf.Abs(secondCube.Column - firstCube.Column);
             int rowDistance = Mathf.Abs(secondCube.Row - firstCube.Row);
             int gridDistance = Mathf.Max(1, columnDistance + rowDistance);
-            int totalSegmentCount = rope.SegmentCount * gridDistance;
+            int additionalCellSpans = gridDistance - 1;
+            float minimumDensity = Mathf.Min(minimumRopeSegmentsPerCell, rope.SegmentCount);
+            float segmentsPerCell = Mathf.Max(
+                minimumDensity,
+                rope.SegmentCount - additionalCellSpans * ropeSegmentsPerCellFalloff);
+            int totalSegmentCount = Mathf.Max(
+                2,
+                Mathf.RoundToInt(gridDistance * segmentsPerCell));
 
             rope.Build(firstCube.transform, secondCube.transform, totalSegmentCount);
             return rope;
