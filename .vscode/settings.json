@@ -56,6 +56,19 @@
         "temp/": true,
         "Temp/": true
     },
+    "files.watcherExclude": {
+        "**/.git/objects/**": true,
+        "**/.git/subtree-cache/**": true,
+        "**/Library/**": true,
+        "**/Logs/**": true,
+        "**/obj/**": true,
+        "**/Temp/**": true,
+        "**/UserSettings/**": true,
+        "**/Assets/**": false,
+        "**/Packages/**": false
+    },
+    "dotnet.backgroundAnalysis.compilerDiagnosticsScope": "fullSolution",
+    "dotnet.backgroundAnalysis.analyzerDiagnosticsScope": "fullSolution",
     "files.associations": {
         "*.asset": "yaml",
         "*.meta": "yaml",
