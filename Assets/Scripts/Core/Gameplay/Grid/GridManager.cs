@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Core.Gameplay.Hook;
@@ -15,17 +16,26 @@ namespace Core
     /// </summary>
     public class GridManager : MonoBehaviour
     {
+        [Serializable]
+        private struct CubeColorDefinition
+        {
+            public string code;
+            public Sprite normalSprite;
+            public Sprite hookedSprite;
+        }
+
         [Header("Rope Object")]
         [SerializeField] private GameObject ropeObjectPrefab;
         [Tooltip("Reduces segment density for every additional grid-cell span. Example: 6, 5.5, 5...")]
         [SerializeField, Min(0f)] private float ropeSegmentsPerCellFalloff = 0.5f;
         [Tooltip("Lowest allowed segment density on long ropes.")]
         [SerializeField, Min(1f)] private float minimumRopeSegmentsPerCell = 3f;
-        [Header("Cube Prefabs")]
-        [SerializeField] private GameObject redCubePrefab;
-        [SerializeField] private GameObject greenCubePrefab;
-        [SerializeField] private GameObject yellowCubePrefab;
-        [SerializeField] private GameObject blueCubePrefab;
+
+        // One shared prefab for every color - adding a new color is just a new
+        // entry below (code + sprites), no new prefab/variant required.
+        [Header("Cube Prefab")]
+        [SerializeField] private GameObject cubePrefab;
+        [SerializeField] private CubeColorDefinition[] cubeColors;
         [Header("Grid Horizontal Padding")]
         [SerializeField] private float GridHorizontalPadding;
 
@@ -50,12 +60,35 @@ namespace Core
         [SerializeField] private float vibrateInterval = 0.5f;
         [SerializeField] private float pullSpeed = 10f;
         [SerializeField] private float homeColumnDropDelay = 0.2f;
+        
 
         private Cube[,] _cubes;
         private int _width;
         private int _height;
         private Vector2 _cellSize;
         private Vector3 _origin;
+
+        // Fired once a level actually starts building, so UI (e.g. UIManager)
+        // can react without GridManager knowing anything about panels.
+        public static event Action OnGameStarted;
+
+        // Per-instance since they carry live gameplay data - unlike
+        // OnGameStarted, a ScoreBoard listener needs the specific grid it's
+        // tracking, not "any grid, anywhere".
+        public event Action<string> OnCubeCleared;
+        public event Action OnMoveUsed;
+
+        private Dictionary<string, CubeColorDefinition> _colorDefinitions;
+
+        private void Awake()
+        {
+            _colorDefinitions = new Dictionary<string, CubeColorDefinition>();
+            foreach (CubeColorDefinition definition in cubeColors)
+            {
+                if (string.IsNullOrEmpty(definition.code)) continue;
+                _colorDefinitions[definition.code] = definition;
+            }
+        }
 
         private void Start()
         {
@@ -78,6 +111,7 @@ namespace Core
             if (LevelManager.Instance == null) return;
 
             gameObject.SetActive(true);
+            OnGameStarted?.Invoke();
 
             LevelData levelData = LevelManager.Instance.LoadCurrentLevelData();
             if (levelData != null) BuildGrid(levelData);
@@ -129,29 +163,34 @@ namespace Core
         // instead of using the initial build's slower, ease-in-heavy reveal.
         private Cube SpawnCube(int col, int row, string colorCode, Vector2 cubeScale, float speed, Ease ease)
         {
-            GameObject prefab = GetPrefabForColorCode(colorCode);
-            if (prefab == null) return null;
+            if (cubePrefab == null) return null;
+
+            if (!_colorDefinitions.TryGetValue(colorCode, out CubeColorDefinition definition))
+            {
+                Debug.LogWarning($"[GridManager] Color code '{colorCode}' has no cube color definition assigned — skipping.");
+                return null;
+            }
 
             Vector3 targetPosition = GetWorldPosition(col, row, _origin);
             Vector3 spawnPosition = new Vector3(targetPosition.x, GetOffScreenTopY(), targetPosition.z);
             float fallDuration = CalculateMoveDuration(spawnPosition.y - targetPosition.y, speed);
 
-            GameObject cubeObject = Instantiate(prefab, spawnPosition, Quaternion.identity, transform);
+            GameObject cubeObject = Instantiate(cubePrefab, spawnPosition, Quaternion.identity, transform);
             cubeObject.name = $"Cube_{col}_{row}";
             cubeObject.transform.localScale = new Vector3(
-                prefab.transform.localScale.x * cubeScale.x,
-                prefab.transform.localScale.y * cubeScale.y,
-                prefab.transform.localScale.z);
+                cubePrefab.transform.localScale.x * cubeScale.x,
+                cubePrefab.transform.localScale.y * cubeScale.y,
+                cubePrefab.transform.localScale.z);
 
             Cube cube = cubeObject.GetComponent<Cube>();
             if (cube == null)
             {
-                Debug.LogError($"[GridManager] Prefab '{prefab.name}' has no Cube component.");
+                Debug.LogError($"[GridManager] Prefab '{cubePrefab.name}' has no Cube component.");
                 Destroy(cubeObject);
                 return null;
             }
 
-            cube.Initialize(this, col, row, colorCode);
+            cube.Initialize(this, col, row, colorCode, definition.normalSprite, definition.hookedSprite);
             _cubes[col, row] = cube;
 
             cubeObject.transform.DOMove(targetPosition, fallDuration)
@@ -204,6 +243,7 @@ namespace Core
                 return; // nothing of the same color for the hook to attach to
             }
 
+            OnMoveUsed?.Invoke();
             StartCoroutine(PlayHookExplosion(startCube, matchingCubes, startCol, startRow, furthestCol, furthestRow, direction));
         }
 
@@ -391,6 +431,8 @@ namespace Core
         {
             if (cube == null) return;
 
+            OnCubeCleared?.Invoke(cube.ColorCode);
+
             cube.transform.DOKill();
             cube.transform.DOScale(Vector3.zero, destroyDuration)
                 .SetEase(Ease.InBack)
@@ -455,28 +497,25 @@ namespace Core
             return Mathf.Max(minDropDuration, distance / speed);
         }
 
-        // "rand" needs to resolve to one concrete color at spawn time so the
-        // spawned cube has a stable ColorCode for the hook to match against.
-        private static string ResolveColorCode(string code)
+        // Lets other UI (e.g. ScoreBoardController's goal badges) reuse the same
+        // color -> sprite mapping instead of keeping a second copy of it.
+        public Sprite GetNormalSprite(string colorCode)
         {
-            if (code != "rand") return code;
-
-            string[] colors = { "r", "g", "y", "b" };
-            return colors[Random.Range(0, colors.Length)];
+            return _colorDefinitions.TryGetValue(colorCode, out CubeColorDefinition definition)
+                ? definition.normalSprite
+                : null;
         }
 
-        private GameObject GetPrefabForColorCode(string colorCode)
+        // "rand" needs to resolve to one concrete color at spawn time so the
+        // spawned cube has a stable ColorCode for the hook to match against.
+        // Picks from whatever colors are configured in the inspector, so a
+        // newly added color is automatically eligible for random spawns.
+        private string ResolveColorCode(string code)
         {
-            switch (colorCode)
-            {
-                case "r": return redCubePrefab;
-                case "g": return greenCubePrefab;
-                case "y": return yellowCubePrefab;
-                case "b": return blueCubePrefab;
-                default:
-                    Debug.LogWarning($"[GridManager] Cell type '{colorCode}' has no prefab assigned yet — skipping.");
-                    return null;
-            }
+            if (code != "rand") return code;
+            if (cubeColors == null || cubeColors.Length == 0) return code;
+
+            return cubeColors[UnityEngine.Random.Range(0, cubeColors.Length)].code;
         }
 
         // Cells are sized off the camera's view width so grid_width cubes always
@@ -511,17 +550,19 @@ namespace Core
 
         private Vector2 DetermineNativePrefabSize()
         {
-            GameObject reference = redCubePrefab != null ? redCubePrefab
-                : greenCubePrefab != null ? greenCubePrefab
-                : yellowCubePrefab != null ? yellowCubePrefab
-                : blueCubePrefab;
+            if (cubePrefab == null) return Vector2.one;
 
-            if (reference == null) return Vector2.one;
+            SpriteRenderer sr = cubePrefab.GetComponentInChildren<SpriteRenderer>();
+            if (sr == null) return Vector2.one;
 
-            SpriteRenderer sr = reference.GetComponentInChildren<SpriteRenderer>();
-            if (sr == null || sr.sprite == null) return Vector2.one;
+            // The shared prefab may not have a sprite of its own assigned -
+            // fall back to the first configured color so sizing still works.
+            Sprite sprite = sr.sprite != null ? sr.sprite
+                : cubeColors is { Length: > 0 } ? cubeColors[0].normalSprite
+                : null;
+            if (sprite == null) return Vector2.one;
 
-            Vector2 spriteSize = sr.sprite.bounds.size;
+            Vector2 spriteSize = sprite.bounds.size;
             Vector3 scale = sr.transform.lossyScale;
             return new Vector2(spriteSize.x * scale.x, spriteSize.y * scale.y);
         }

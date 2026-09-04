@@ -13,9 +13,6 @@ namespace Items
         [SerializeField] private float vibrateDuration = 0.2f;
         [SerializeField] private float vibrateStrength = 0.08f;
 
-        [Header("Hooked Visual")]
-        [SerializeField] private Sprite hookedSprite;
-
         private bool isHooked { get; set; }
 
         public int Column { get; private set; }
@@ -25,18 +22,27 @@ namespace Items
         private GridManager _gridManager;
         private Vector2 _pressScreenPosition;
         private SpriteRenderer _spriteRenderer;
+        private Sprite _hookedSprite;
 
         private void Awake()
         {
             _spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         }
 
-        public void Initialize(GridManager gridManager, int column, int row, string colorCode)
+        // normalSprite/hookedSprite come from GridManager's per-color-code
+        // definitions rather than a field on this prefab, so one Cube prefab
+        // can be reused for every color instead of needing a prefab variant
+        // per color.
+        public void Initialize(GridManager gridManager, int column, int row, string colorCode, Sprite normalSprite, Sprite hookedSprite)
         {
             _gridManager = gridManager;
             Column = column;
             Row = row;
             ColorCode = colorCode;
+            _hookedSprite = hookedSprite;
+
+            if (_spriteRenderer != null && normalSprite != null)
+                _spriteRenderer.sprite = normalSprite;
         }
 
         public void SetGridPosition(int column, int row)
@@ -62,8 +68,8 @@ namespace Items
         public void Vibrate()
         {
             isHooked = true;
-            if (_spriteRenderer != null && hookedSprite != null)
-                _spriteRenderer.sprite = hookedSprite;
+            if (_spriteRenderer != null && _hookedSprite != null)
+                _spriteRenderer.sprite = _hookedSprite;
 
             transform.DOShakeScale(vibrateDuration, vibrateStrength, vibrato: 10, randomness: 90, fadeOut: true)
                 .SetLink(gameObject);

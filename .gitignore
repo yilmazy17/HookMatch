@@ -115,3 +115,7 @@ InitTestScene*.unity*
 
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+
+# graphify knowledge graph output
+graphify-out/
+graphify-out.meta

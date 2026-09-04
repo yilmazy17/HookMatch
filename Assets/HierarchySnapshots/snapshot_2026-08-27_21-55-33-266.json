@@ -1,0 +1,656 @@
+{
+    "sceneName": "GameScene",
+    "timestamp": "2026-08-27 21:55:33.266",
+    "objects": [
+        {
+            "name": "Main Camera",
+            "path": "Main Camera",
+            "parentPath": "",
+            "position": [
+                0.0,
+                0.0,
+                -10.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "components": [
+                "Transform",
+                "Camera",
+                "AudioListener",
+                "UniversalAdditionalCameraData"
+            ]
+        },
+        {
+            "name": "UIRoot",
+            "path": "UIRoot",
+            "parentPath": "",
+            "position": [
+                361.2644958496094,
+                338.8143005371094,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "components": [
+                "Transform",
+                "UIManager"
+            ]
+        },
+        {
+            "name": "Canvas",
+            "path": "UIRoot/Canvas",
+            "parentPath": "UIRoot",
+            "position": [
+                189.0,
+                336.0,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                0.4724999964237213,
+                0.4724999964237213,
+                0.4724999964237213
+            ],
+            "components": [
+                "RectTransform",
+                "Canvas",
+                "CanvasScaler",
+                "GraphicRaycaster"
+            ]
+        },
+        {
+            "name": "Shop",
+            "path": "UIRoot/Canvas/Shop",
+            "parentPath": "UIRoot/Canvas",
+            "position": [
+                189.0,
+                336.0,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "components": [
+                "RectTransform",
+                "CanvasRenderer",
+                "Image"
+            ]
+        },
+        {
+            "name": "ShopText",
+            "path": "UIRoot/Canvas/Shop/ShopText",
+            "parentPath": "UIRoot/Canvas/Shop",
+            "position": [
+                189.0,
+                336.0,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "components": [
+                "RectTransform",
+                "CanvasRenderer",
+                "TextMeshProUGUI"
+            ]
+        },
+        {
+            "name": "Home",
+            "path": "UIRoot/Canvas/Home",
+            "parentPath": "UIRoot/Canvas",
+            "position": [
+                189.0,
+                336.0,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "components": [
+                "RectTransform",
+                "CanvasRenderer",
+                "Image"
+            ]
+        },
+        {
+            "name": "LevelButton",
+            "path": "UIRoot/Canvas/Home/LevelButton",
+            "parentPath": "UIRoot/Canvas/Home",
+            "position": [
+                189.0,
+                108.67498779296875,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "components": [
+                "RectTransform",
+                "CanvasRenderer",
+                "Image",
+                "LevelButton"
+            ]
+        },
+        {
+            "name": "LevelButtonText",
+            "path": "UIRoot/Canvas/Home/LevelButton/LevelButtonText",
+            "parentPath": "UIRoot/Canvas/Home/LevelButton",
+            "position": [
+                188.82139587402345,
+                108.1396484375,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "components": [
+                "RectTransform",
+                "CanvasRenderer",
+                "TextMeshProUGUI"
+            ]
+        },
+        {
+            "name": "Settings",
+            "path": "UIRoot/Canvas/Settings",
+            "parentPath": "UIRoot/Canvas",
+            "position": [
+                189.0,
+                336.0,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "components": [
+                "RectTransform",
+                "CanvasRenderer",
+                "Image"
+            ]
+        },
+        {
+            "name": "SettingsText",
+            "path": "UIRoot/Canvas/Settings/SettingsText",
+            "parentPath": "UIRoot/Canvas/Settings",
+            "position": [
+                189.0,
+                336.0,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "components": [
+                "RectTransform",
+                "CanvasRenderer",
+                "TextMeshProUGUI"
+            ]
+        },
+        {
+            "name": "LeaderBoard",
+            "path": "UIRoot/Canvas/LeaderBoard",
+            "parentPath": "UIRoot/Canvas",
+            "position": [
+                189.0,
+                336.0,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "components": [
+                "RectTransform",
+                "CanvasRenderer",
+                "Image"
+            ]
+        },
+        {
+            "name": "LeaderBoardText",
+            "path": "UIRoot/Canvas/LeaderBoard/LeaderBoardText",
+            "parentPath": "UIRoot/Canvas/LeaderBoard",
+            "position": [
+                189.0,
+                336.0,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "components": [
+                "RectTransform",
+                "CanvasRenderer",
+                "TextMeshProUGUI"
+            ]
+        },
+        {
+            "name": "Journey",
+            "path": "UIRoot/Canvas/Journey",
+            "parentPath": "UIRoot/Canvas",
+            "position": [
+                189.0,
+                336.0,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "components": [
+                "RectTransform",
+                "CanvasRenderer",
+                "Image"
+            ]
+        },
+        {
+            "name": "JourneyText",
+            "path": "UIRoot/Canvas/Journey/JourneyText",
+            "parentPath": "UIRoot/Canvas/Journey",
+            "position": [
+                189.0,
+                336.0,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "components": [
+                "RectTransform",
+                "CanvasRenderer",
+                "TextMeshProUGUI"
+            ]
+        },
+        {
+            "name": "InGame",
+            "path": "UIRoot/Canvas/InGame",
+            "parentPath": "UIRoot/Canvas",
+            "position": [
+                189.0,
+                336.0002136230469,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "components": [
+                "RectTransform",
+                "CanvasRenderer",
+                "Image"
+            ]
+        },
+        {
+            "name": "ScoreBoard",
+            "path": "UIRoot/Canvas/InGame/ScoreBoard",
+            "parentPath": "UIRoot/Canvas/InGame",
+            "position": [
+                189.0,
+                886.67431640625,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "components": [
+                "RectTransform",
+                "CanvasRenderer",
+                "Image",
+                "ScoreBoardIntro",
+                "ScoreBoardController"
+            ]
+        },
+        {
+            "name": "MoveCountFieldText",
+            "path": "UIRoot/Canvas/InGame/ScoreBoard/MoveCountFieldText",
+            "parentPath": "UIRoot/Canvas/InGame/ScoreBoard",
+            "position": [
+                291.51361083984377,
+                886.674072265625,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "components": [
+                "RectTransform",
+                "CanvasRenderer",
+                "TextMeshProUGUI"
+            ]
+        },
+        {
+            "name": "PointPart",
+            "path": "UIRoot/Canvas/InGame/ScoreBoard/PointPart",
+            "parentPath": "UIRoot/Canvas/InGame/ScoreBoard",
+            "position": [
+                100.26449584960938,
+                828.531494140625,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "components": [
+                "RectTransform",
+                "CanvasRenderer",
+                "Image"
+            ]
+        },
+        {
+            "name": "Score Field Text",
+            "path": "UIRoot/Canvas/InGame/ScoreBoard/PointPart/Score Field Text",
+            "parentPath": "UIRoot/Canvas/InGame/ScoreBoard/PointPart",
+            "position": [
+                68.21932983398438,
+                829.1060791015625,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "components": [
+                "RectTransform",
+                "CanvasRenderer",
+                "TextMeshProUGUI"
+            ]
+        },
+        {
+            "name": "Score",
+            "path": "UIRoot/Canvas/InGame/ScoreBoard/PointPart/Score",
+            "parentPath": "UIRoot/Canvas/InGame/ScoreBoard/PointPart",
+            "position": [
+                131.9817657470703,
+                828.81884765625,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "components": [
+                "RectTransform",
+                "CanvasRenderer",
+                "TextMeshProUGUI"
+            ]
+        },
+        {
+            "name": "MoveCount",
+            "path": "UIRoot/Canvas/InGame/ScoreBoard/MoveCount",
+            "parentPath": "UIRoot/Canvas/InGame/ScoreBoard",
+            "position": [
+                336.750732421875,
+                886.67431640625,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "components": [
+                "RectTransform",
+                "CanvasRenderer",
+                "Image"
+            ]
+        },
+        {
+            "name": "Text (TMP)",
+            "path": "UIRoot/Canvas/InGame/ScoreBoard/MoveCount/Text (TMP)",
+            "parentPath": "UIRoot/Canvas/InGame/ScoreBoard/MoveCount",
+            "position": [
+                337.2237243652344,
+                886.989013671875,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "components": [
+                "RectTransform",
+                "CanvasRenderer",
+                "TextMeshProUGUI"
+            ]
+        },
+        {
+            "name": "GoalPanel",
+            "path": "UIRoot/Canvas/InGame/ScoreBoard/GoalPanel",
+            "parentPath": "UIRoot/Canvas/InGame/ScoreBoard",
+            "position": [
+                133.16468811035157,
+                890.438232421875,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "components": [
+                "RectTransform"
+            ]
+        },
+        {
+            "name": "EventSystem",
+            "path": "EventSystem",
+            "parentPath": "",
+            "position": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "components": [
+                "Transform",
+                "EventSystem",
+                "InputSystemUIInputModule"
+            ]
+        },
+        {
+            "name": "Grid",
+            "path": "Grid",
+            "parentPath": "",
+            "position": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "components": [
+                "Transform",
+                "GridManager"
+            ]
+        },
+        {
+            "name": "GridBackground",
+            "path": "Grid/GridBackground",
+            "parentPath": "Grid",
+            "position": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "components": [
+                "Transform",
+                "SpriteRenderer"
+            ]
+        }
+    ]
+}

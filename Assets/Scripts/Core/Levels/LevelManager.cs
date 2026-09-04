@@ -39,6 +39,9 @@ namespace Core
             Instance = this;
             DontDestroyOnLoad(gameObject);
 
+            Application.targetFrameRate = 120;
+            QualitySettings.vSyncCount = 0;
+
             MaxLevel = Mathf.Max(1, Resources.LoadAll<TextAsset>(LevelsResourcesFolder).Length);
             CurrentLevel = Mathf.Clamp(PlayerPrefs.GetInt(LevelPrefsKey, 1), 1, MaxLevel);
         }
